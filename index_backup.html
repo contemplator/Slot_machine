@@ -1,0 +1,556 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+	</head>
+	<style type="text/css">
+		.init{
+			background-color: #000000;
+		}
+		#cav{
+			background-color: #FFFFFF;
+			position: relative;
+			width: 640px;
+			height: 480px;
+			margin: 0px auto;
+			margin-top: 150px;
+		}
+		#btn-start{
+			position: absolute;
+			top: 20;
+			left: 20;
+			width: 100px;
+			height: 30px;
+		}
+		#shelter-top{
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			height: 250px;
+			z-index: 5;
+			background-color: #000000;
+		}
+		#shelter-bottom{
+			position: absolute;
+			top: 570px;
+			width: 100%;
+			height: 250px;
+			z-index: 5;
+			background-color: #000000;	
+		}
+		#coda{
+			position: absolute;
+			z-index: 10;
+			top: 600px;
+			left: 300px;
+			width: 200px;
+			height: 40px;
+		}
+		.coda_input{
+			font-size: 30px;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+	<script type="text/javascript">
+		// initial socket with arduino
+		// use the iosocket
+		// coda is the user owned money
+		// var iosocket;
+		// var receive_order;
+		// var coda = 5000;
+
+		// window.onload = function() {
+		//     initSocketIO();
+	 	// };
+
+		// function initSocketIO(){
+		// 	iosocket = io.connect();
+		// 	iosocket.on('onconnection', function(value) {
+		// 		receive_order = value.pollOneValue;
+		// 		iosocket.on('update', function (recievedData) {
+		// 			receive_order = recievedData.switchValue;
+		// 			if(receive_order.trim() == "RF"){
+		// 				console.log(receive_order);
+		// 				$("#coda_input").val("5000");
+		// 			}
+		// 			if($("#coda_input").val() != "no user"){
+		// 				if(receive_order.trim() == "PS"){ // confirm the order from switch arduino
+		// 					console.log(receive_order);
+		// 					if(gameStatus == "finish"){
+		// 						coda -= 50;	
+		// 					}
+		// 					startGame();
+		// 					$("#coda_input").val(coda);
+		// 				}
+		// 			}
+		// 		});
+		//     });
+		// }
+	</script>
+
+	<script type="text/javascript">
+		// initial the game
+		var gameStatus = "finish"; // finish, running, waiting, stopping, finish...
+		
+		var fruit1 = "https://lh3.googleusercontent.com/7tOEBSSGn3B4vELrqp6zOJdx_MttT8mBSf_xKrmqAb8=s210-p-no";
+		var fruit2 = "https://lh5.googleusercontent.com/bmrlXMRB_2Bjvp4kVtqN_FNi8Vi3M8vaySSwUtY_6OI=w207-h210-p-no";
+		var fruit3 = "https://lh3.googleusercontent.com/mWG-_6ljBVjnh4shHDCKkQ1ONnfSUCbmarq9cv5pUsU=w208-h210-p-no";
+		var fruit4 = "https://lh5.googleusercontent.com/puo43vufUDRpBKgR-f_lRjEksdOB6P7PEEHLnowVRtQ=w211-h210-p-no";
+		var rad = [[fruit1, fruit2, fruit3, fruit4],[fruit1, fruit2, fruit3, fruit4],[fruit1, fruit2, fruit3, fruit4]];
+
+		// setInterval
+		var as1, as2, as3, as4, bs1, bs2, bs3, bs4, cs1, cs2, cs3, cs4;
+		// each fruit status, false = stop, true = runing
+		var af1 = false, af2 = false, af3 = false, af4 = false, bf1 = false, bf2 = false, bf3 = false, bf4 = false, cf1 = false, cf2 = false, cf3 = false, cf4 = false;
+		// when user send stop order, machine will immediately know the result, and judge result whether is win or not.
+		var result1 = [], result2 = [], result3 = [];
+
+		$(document).ready(function(){
+			// loading the fruit images and position
+			$("#a1").css({top: -160, left: 0, position:'absolute', width: 200, height: 160});
+			$("#a1").html(getFruit(0));
+			$("#a2").css({top: 0, left: 0, position:'absolute', width: 200, height: 160});
+			$("#a2").html(getFruit(0));
+			$("#a3").css({top: 160, left: 0, position:'absolute', width: 200, height: 160});
+			$("#a3").html(getFruit(0));
+			$("#a4").css({top: 320, left: 0, position:'absolute', width: 200, height: 160});
+			$("#a4").html(getFruit(0));
+
+			$("#b1").css({top: -160, left: 220, position:'absolute', width: 200, height: 160});
+			$("#b1").html(getFruit(1));
+			$("#b2").css({top: 0, left: 220, position:'absolute', width: 200, height: 160});
+			$("#b2").html(getFruit(1));
+			$("#b3").css({top: 160, left: 220, position:'absolute', width: 200, height: 160});
+			$("#b3").html(getFruit(1));
+			$("#b4").css({top: 320, left: 220, position:'absolute', width: 200, height: 160});
+			$("#b4").html(getFruit(1));
+
+			$("#c1").css({top: -160, left: 440, position:'absolute', width: 200, height: 160});
+			$("#c1").html(getFruit(2));
+			$("#c2").css({top: 0, left: 440, position:'absolute', width: 200, height: 160});
+			$("#c2").html(getFruit(2));
+			$("#c3").css({top: 160, left: 440, position:'absolute', width: 200, height: 160});
+			$("#c3").html(getFruit(2));
+			$("#c4").css({top: 320, left: 440, position:'absolute', width: 200, height: 160});
+			$("#c4").html(getFruit(2));
+
+			console.log("gameStatus: " + gameStatus);
+		});
+	</script>
+
+	<script type="text/javascript">
+
+		// Let user can start game by typing "Enter"
+		document.onkeydown=keyFunction;
+		function keyFunction() {
+			if(event.keyCode == 13){
+				startGame();
+			}
+		}
+
+		// judge the game status to start or stop game
+		// and set an mechanism to prevent user stop game immediately after start gmae
+		function startGame(){
+			if(gameStatus == "finish"){ // 遊戲若是等待開始，則會開始遊戲
+				$("#victory").html('');
+				$("#pull").html('<embed id="pull" width="0" height="0" src="resource/pull_voice.mp3" autostart="true"></embed>');
+				rollFruit(1); // 開始轉動
+				gameStatus = "running";
+				console.log("gameStatus: " + gameStatus);
+				// alert($("#victory").attr("autostart"));
+				// 等待速度達到最大, 2秒後會達到, gameStauts轉成waitting停止指令
+				setTimeout(function(){
+					gameStatus = "waiting";
+					console.log("gameStatus: " + gameStatus);
+				}, 2000);
+			}else if(gameStatus == "running"){
+				
+			}else if(gameStatus == "waiting"){ // 遊戲還沒開始
+				gameStatus = "stopping";
+				console.log("gameStatus: " + gameStatus);
+				rollFruit(0); // 等待轉動停止, 並結算結果
+			}else{
+
+			}
+		}
+
+		// append photo to visible view on browser
+		function getFruit(number){
+			var len = rad[number].length;
+			var index = Math.floor(Math.random()*len);
+			var fruit = rad[number][index];
+			var html = "<img src='"+ fruit + "' width='100%' height='100%'>";
+			rad[number].splice(index, 1);
+			return html;
+		}
+	</script>
+	<body class="init">
+		<<div id="cav">
+			<div id="a1"></div>
+			<div id="a2"></div>
+			<div id="a3"></div>
+			<div id="a4"></div>
+			<div id="b1"></div>
+			<div id="b2"></div>
+			<div id="b3"></div>
+			<div id="b4"></div>
+			<div id="c1"></div>
+			<div id="c2"></div>
+			<div id="c3"></div>
+			<div id="c4"></div>
+		</div>
+		<div id="shelter-top"></div>
+		<div id="shelter-bottom"></div>
+
+		<div id="pull"></div>
+		<div id="victory"></div>
+		<div id="scrolling"></div>
+		<div id="coda"><input type="text" id="coda_input" name="coda_input" class="coda_input" disabled="true" value="no user" /></div>
+		<div><Button id="btn-start" onclick="startGame()">開始遊戲</Button></div>
+	</body>
+	<script type="text/javascript">
+		function rollFruit(s){
+			if(s == 1){ // start
+				$("#scrolling").html('<embed id="scrolling" width="0" height="0" src="resource/main_voice.mp3" autostart="true" loop="true"></embed>');
+				var v1 = 40;
+				var v2 = 60;
+				var v3 = 80;
+				var timer = 50;
+				var floor = 480;
+				var ceiling = -160;
+
+				as1 = setInterval(function(){roll1($("#a1"))}, timer);
+				as2 = setInterval(function(){roll1($("#a2"))}, timer);
+				as3 = setInterval(function(){roll1($("#a3"))}, timer);
+				as4 = setInterval(function(){roll1($("#a4"))}, timer);
+				bs1 = setInterval(function(){roll2($("#b1"))}, timer);
+				bs2 = setInterval(function(){roll2($("#b2"))}, timer);
+				bs3 = setInterval(function(){roll2($("#b3"))}, timer);
+				bs4 = setInterval(function(){roll2($("#b4"))}, timer);
+				cs1 = setInterval(function(){roll3($("#c1"))}, timer);
+				cs2 = setInterval(function(){roll3($("#c2"))}, timer);
+				cs3 = setInterval(function(){roll3($("#c3"))}, timer);
+				cs4 = setInterval(function(){roll3($("#c4"))}, timer);
+
+				function roll1(object){
+					position_current = object.position();
+					if(position_current.top >= floor){
+						position_current.top = ceiling;
+					}
+					object.css({top:(position_current.top + v1), left: 0, position:'absolute', width: 200, height: 160});
+				}
+
+				function roll2(object){
+					position_current = object.position();
+					if(position_current.top >= floor){
+						position_current.top = ceiling;
+					}
+					object.css({top:(position_current.top + v2), left: 220, position:'absolute', width: 200, height: 160});
+				}
+
+				function roll3(object){
+					position_current = object.position();
+					if(position_current.top >= floor){
+						position_current.top = ceiling;
+					}
+					object.css({top:(position_current.top + v3), left: 440, position:'absolute', width: 200, height: 160});
+				}
+			}else{ // stop
+				var a = 1;
+				var v1 = 40;
+				var v2 = 60;
+				var v3 = 80;
+				var minV = 3;
+				var timer = 50;
+				var floor = 480;
+				var ceiling = -160;
+				
+				clearInterval(as1);
+				clearInterval(as2);
+				clearInterval(as3);
+				clearInterval(as4);
+				clearInterval(bs1);
+				clearInterval(bs2);
+				clearInterval(bs3);
+				clearInterval(bs4);
+				clearInterval(cs1);
+				clearInterval(cs2);
+				clearInterval(cs3);
+				clearInterval(cs4);
+
+				a1_y = $("#a1").position().top;
+				a2_y = $("#a2").position().top;
+				a3_y = $("#a3").position().top;
+				a4_y = $("#a4").position().top;
+				b1_y = $("#b1").position().top;
+				b2_y = $("#b2").position().top;
+				b3_y = $("#b3").position().top;
+				b4_y = $("#b4").position().top;
+				c1_y = $("#c1").position().top;
+				c2_y = $("#c2").position().top;
+				c3_y = $("#c3").position().top;
+				c4_y = $("#c4").position().top;
+
+				// get the rank of y and get the result
+				var fruit_a = ["#a1", "#a2", "#a3", "#a4"]; // 原始的水果順序 a1, a2, a3, a4
+				var fruity_ranka = sortFruit([a1_y, a2_y, a3_y, a4_y]); // 從最上面到最下面的水果順序
+				var fruit_ay = [a1_y, a2_y, a3_y, a4_y]; // 用來重新排列
+				var fruit_ranka = getFruitRank(fruit_ay, fruity_ranka, fruit_a); // 顯示重新排列的水果順序
+				var stop1Y = getStopY(fruit_ranka, result1);
+
+				var fruit_b = ["#b1", "#b2", "#b3", "#b4"];
+				var fruity_rankb = sortFruit([b1_y, b2_y, b3_y, b4_y]);
+				var fruit_by = [b1_y, b2_y, b3_y, b4_y];
+				var fruit_rankb = getFruitRank(fruit_by, fruity_rankb, fruit_b);
+				var stop2Y = getStopY(fruit_rankb, result2);
+
+				var fruit_c = ["#c1", "#c2", "#c3", "#c4"];
+				var fruity_rankc = sortFruit([c1_y, c2_y, c3_y, c4_y]);
+				var fruit_cy = [c1_y, c2_y, c3_y, c4_y];
+				var fruit_rankc = getFruitRank(fruit_cy, fruity_rankc, fruit_c);
+				var stop3Y = getStopY(fruit_rankc, result3);
+				
+				as1 = setInterval(function(){slowdown1(as1, $("#a1"), 0)}, timer);
+				as2 = setInterval(function(){slowdown1(as2, $("#a2"), 1)}, timer);
+				as3 = setInterval(function(){slowdown1(as3, $("#a3"), 2)}, timer);
+				as4 = setInterval(function(){slowdown1(as4, $("#a4"), 3)}, timer);
+				bs1 = setInterval(function(){slowdown2(bs1, $("#b1"), 0)}, timer);
+				bs2 = setInterval(function(){slowdown2(bs2, $("#b2"), 1)}, timer);
+				bs3 = setInterval(function(){slowdown2(bs3, $("#b3"), 2)}, timer);
+				bs4 = setInterval(function(){slowdown2(bs4, $("#b4"), 3)}, timer);
+				cs1 = setInterval(function(){slowdown3(cs1, $("#c1"), 0)}, timer);
+				cs2 = setInterval(function(){slowdown3(cs2, $("#c2"), 1)}, timer);
+				cs3 = setInterval(function(){slowdown3(cs3, $("#c3"), 2)}, timer);
+				cs4 = setInterval(function(){slowdown3(cs4, $("#c4"), 3)}, timer);
+
+				// fixPosition();
+				var resultFruit = getMiddleFruit(fruit_ranka, fruit_rankb, fruit_rankc);
+
+				function slowdown1(timeInterval, object, order){
+					current_position = object.position();
+					if(current_position.top >= floor){
+						current_position.top = ceiling;
+					}
+					if(v1 > minV){
+						v1 -= a;
+					}else{
+						v1 = minV;
+						if(stop1Y[order] == checkPosition(current_position.top)){
+							current_position.top = stop1Y[order];
+							clearInterval(timeInterval);
+							if(order == 0){
+								af1 = false;
+								checkAllFruitStatus();
+							}else if(order == 1){
+								af2 = false;
+								checkAllFruitStatus();
+							}else if(order == 2){
+								af3 = false;
+								checkAllFruitStatus();
+							}else if(order == 3){
+								af4 = false;
+								checkAllFruitStatus();
+							}
+						}
+					}
+					object.css({top:(current_position.top + v1), left: 0, position:'absolute', width: 200, height: 160});
+				}
+
+				function slowdown2(timeInterval, object, order){
+					current_position = object.position();
+					if(current_position.top >= floor){
+						current_position.top = ceiling;
+					}
+					if(v2 > minV){
+						v2 -= a;
+					}else{
+						v2 = minV;
+						if(stop2Y[order] == checkPosition(current_position.top)){
+							current_position.top = stop2Y[order];
+							clearInterval(timeInterval);
+							if(order == 0){
+								bf1 = false;
+								checkAllFruitStatus();
+							}else if(order == 1){
+								bf2 = false;
+								checkAllFruitStatus();
+							}else if(order == 2){
+								bf3 = false;
+								checkAllFruitStatus();
+							}else if(order == 3){
+								bf4 = false;
+								checkAllFruitStatus();
+							}
+						}
+					}
+					object.css({top:(current_position.top + v2), left: 220, position:'absolute', width: 200, height: 160});
+				}
+
+				function slowdown3(timeInterval, object, order){
+					current_position = object.position();
+					if(current_position.top >= floor){
+						current_position.top = ceiling;
+					}
+					if(v3 > minV){
+						v3 -= a;
+					}else{
+						v3 = minV;
+						if(stop3Y[order] == checkPosition(current_position.top)){
+							current_position.top = stop3Y[order];
+							clearInterval(timeInterval);
+							if(order == 0){
+								cf1 = false;
+								checkAllFruitStatus();
+							}else if(order == 1){
+								cf2 = false;
+								checkAllFruitStatus();
+							}else if(order == 2){
+								cf3 = false;
+								checkAllFruitStatus();
+							}else if(order == 3){
+								cf4 = false;
+								checkAllFruitStatus();
+							}
+						}
+					}
+					object.css({top:(current_position.top + v3), left: 440, position:'absolute', width: 200, height: 160});
+				}
+
+				function checkAllFruitStatus(){
+					if(gameStatus == "stopping"){
+						if(af1 == false && af2 == false && af3 == false && af4 == false && bf1 == false && bf2 == false && bf3 == false && bf4 == false && cf1 == false && cf2 == false && cf3 == false && cf4 == false){
+							$("#scrolling").html('');
+							resultFruit = getMiddleFruit(fruit_ranka, fruit_rankb, fruit_rankc);
+							gameStatus = "finish";
+							$("#victory").html('<embed id="victory" width="0" height="0" src="resource/victory_voice.mp3" autostart="true"></embed>')
+							console.log("gameStatus:" + gameStatus);
+						}
+					}
+				}
+
+			}
+		}
+
+		function checkPosition(position){
+			if(Math.abs(position - 0) <= 10){
+				return 0;
+			}else if(Math.abs(position - 160) <= 10){
+				return 160;
+			}else if(Math.abs(position - 320) <= 10){
+				return 320;
+			}else if(Math.abs(position + 160) <= 10){
+				return (-160);
+			}else{
+				return 1000;
+			}
+		}
+
+		function sortFruit(arrayFruit_y){
+			// var oldFruit_y = arrayFruit_y;
+			var newFruit_y = arrayFruit_y.sort(sortNumber);
+			return newFruit_y;
+		}
+
+		function getFruitRank(oldArray, newArray, nameArray){
+			var rank = [];
+			for(var j=0; j<newArray.length; j++){
+				for(var k=0; k<oldArray.length; k++){
+					if(newArray[j] == oldArray[k]){
+						rank.push(nameArray[k]);
+					}
+				}
+			}
+			return rank;
+		}
+
+		function getStopY(rankFruit, resultArray){
+			switch(rankFruit[0]){
+				case "#a1":
+					resultArray.push($("#a3").html());
+					return [-160, 0, 160, 320];
+				case "#a2":
+					resultArray.push($("#a4").html());
+					return [320, -160, 0 ,160];
+				case "#a3":
+					resultArray.push($("#a1").html());
+					return [160, 320, -160, 0];
+				case "#a4":
+					resultArray.push($("#a2").html());
+					return [0, 160, 320, -160];
+				case "#b1":
+					resultArray.push($("#b3").html());
+					return [-160, 0, 160, 320];
+				case "#b2":
+					resultArray.push($("#b4").html());
+					return [320, -160, 0 ,160];
+				case "#b3":
+					resultArray.push($("#b1").html());
+					return [160, 320, -160, 0];
+				case "#b4":
+					resultArray.push($("#b2").html());
+					return [0, 160, 320, -160];
+				case "#c1":
+					resultArray.push($("#c3").html());
+					return [-160, 0, 160, 320];
+				case "#c2":
+					resultArray.push($("#c4").html());
+					return [320, -160, 0 ,160];
+				case "#c3":
+					resultArray.push($("#c1").html());
+					return [160, 320, -160, 0];
+				case "#c4":
+					resultArray.push($("#c2").html());
+					return [0, 160, 320, -160];
+				default:
+					return null;
+			}
+		}
+
+		function sortNumber(a,b){
+			return a - b;
+		}
+
+		function fixPosition(){
+			var fruit = [$("#a1"), $("#a2"), $("#a3"), $("#a4"), $("#b1"), $("#b2"), $("#b3"), $("#b4"), $("#c1"), $("#c2"), $("#c3"), $("#c4")];
+			for(var i=0; i<fruit.length; i++){
+				var position = fruit[i].position().top;
+				if(Math.abs(position + 160) <= 10){
+					fruit[i].position().top = -160;
+				}else if(Math.abs(position - 0) <= 10){
+					fruit[i].position().top = 0;
+				}else if(Math.abs(position - 160) <= 10){
+					fruit[i].position().top = 160;
+				}else if(Math.abs(position - 320) <= 10){
+					fruit[i].position().top = 320;
+				}else{
+					// console.log("error");
+					// console.log(position);
+					Math.abs(10 + 160);
+					Math.abs(position - 0);
+					Math.abs(position - 160)
+					Math.abs(position - 320)
+				}
+				// console.log(fruit[i].position().top);
+			}
+		}
+
+		function getMiddleFruit(order1, order2, order3){
+			var order_result = [];
+			var middle1, middle2, middle3;
+			middle1 = $(order1[2]).html();
+			middle2 = $(order2[2]).html();
+			middle3 = $(order3[2]).html();
+			if(middle1 == middle2 && middle2 == middle3){
+				// Win
+				coda += 250;
+				$("#coda_input").val(coda);
+				console.log("Win");
+			}else{
+				// Lose
+				$("#coda_input").val(coda);
+				console.log("Lose");
+			}
+		}
+	</script>
+</html>
