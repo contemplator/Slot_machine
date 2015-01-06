@@ -3,6 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<script type="text/javascript" src="js/slot.js"></script>
+		<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
 	</head>
 	<style type="text/css">
 		#canvas{
@@ -46,6 +47,7 @@
 			width: 20%;
 			font-size: 44px;
 			text-align: center;
+			font-family: 'Lobster';
 		}
 		#total{
 			position: absolute;
@@ -55,6 +57,7 @@
 			width: 15%;
 			text-align: right;
 			font-size: 44px;
+			font-family: 'Lobster';
 		}
 		#bet{
 			position: absolute;
@@ -64,7 +67,25 @@
 			width: 13%;
 			text-align: right;
 			font-size: 44px;
+			font-family: 'Lobster';
 		}
+		.thorn {
+			position: absolute;
+			background-size: 100% 100%;
+			width: 100%;
+			height: 100%;
+			top: 0px;
+			left: 0px;
+		}
+		.win_light {
+			position: absolute;
+			background-size: 100% 100%;
+			width: 100%;
+			height: 100%;
+			top: 0px;
+			left: 0px;
+		}
+		
 	</style>
 	<body>
 		<div>
@@ -104,5 +125,9 @@
 		<div id="pull"></div>
 		<div id="victory"></div>
 		<div id="scrolling"></div>
+		<embed class="thorn" base="." height="100%" loop="false" menu="true" play="true" src="resource/thorn.swf" 
+				type="application/x-shockwave-flash" width="580" wmode="transparent"></embed>
+		<embed class="win_light" base="." height="100%" loop="false" menu="true" play="true" src="resource/win_light.swf" 
+				type="application/x-shockwave-flash" width="100%" wmode="transparent"></embed>
 	</body>
 </html>

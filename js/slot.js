@@ -39,7 +39,7 @@ $(document).ready(function(){
 	$("#c3").css({top: 560, left: 1035, position:'absolute', width: 150, height: 120});
 	$("#c3").html(getFruit(2));
 
-	$("#total_content").text(total);
+	$("#total_content").text(formatNumber(total));
 	$("#bet_content").text(bet);
 	changeRose();
 	console.log("gameStatus: " + gameStatus);
@@ -63,7 +63,7 @@ function startGame(){
 		clearInterval(chahge);
 		console.log($("#a2").html() + ":" + $("#b2").html() + ":" + $("#c2").html());
 		total -= bet;
-		$("#total_content").text(total);
+		$("#total_content").text(formatNumber(total));
 		$("#victory").html('');
 		$("#pull").html('<embed id="pull" width="0" height="0" src="resource/pull_voice.mp3" autostart="true"></embed>');
 		rollFruit(1); // 開始轉動
@@ -376,7 +376,7 @@ function getMiddleFruit(order1, order2, order3){
 	if(middle1 == middle2 && middle2 == middle3){
 		// Win
 		total += bet * 500;
-		$("#total_content").text(total);
+		$("#total_content").text(formatNumber(total));
 		$("#victory").html('<embed id="victory" width="0" height="0" src="resource/victory_voice.mp3" autostart="true"></embed>');
 		console.log("Win");
 	}else{
@@ -459,4 +459,17 @@ function changeRose(){
 		$("#c2").html(getFruit(2));
 		$("#c3").html(getFruit(2));
 	}, 3000);
+}
+
+function formatNumber(number){
+	var n = number + "";
+    var x = n.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    console.log(typeof(x1));
+    return x1;
 }
